@@ -1,0 +1,40 @@
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
+
+mnist = tf.keras.datasets.mnist
+
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+x_train=x_train.reshape(len(x_train),28,28,1);
+x_test=x_test.reshape(len(x_test),28,28,1)
+x_test.shape
+def display_image(position):
+    image = x_train[position].squeeze()
+    plt.title('Example %d. Label: %d' % (position, y_train[position]))
+    plt.imshow(image, cmap=plt.cm.gray_r)
+display_image(0)
+
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(6,(3, 3), activation='relu', input_shape=(28,28,1)),
+      tf.keras.layers.AveragePooling2D(),
+    tf.keras.layers.Conv2D(6,(3, 3), activation='relu', input_shape=(28,28,1)),
+      tf.keras.layers.AveragePooling2D(),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+model.summary()
+
+model.compile(optimizer='rmsprop',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+              
+model.fit(x_train, y_train, epochs=5)
+
+model.evaluate(x_test, y_test)
